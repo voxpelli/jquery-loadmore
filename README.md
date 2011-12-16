@@ -30,3 +30,7 @@ Advanced:
 * **pageSize** - how many elements should be expected on a new page? If less than this amount is received we've reached the end and removes the more-link.
 * **pageParam** - what's the name of the query parameter for the page to fetch in the AJAX-requests?
 * **loaded** - a function to execute once a new page has been loaded
+
+## Support
+
+[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=voxpelli&url=https://github.com/voxpelli/jquery-loadmore&title=loadMore.js&language=en_GB&tags=github&category=software)
