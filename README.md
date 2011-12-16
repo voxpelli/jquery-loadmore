@@ -1,7 +1,7 @@
 loadMore.js
 =======
 
-loadMore.js is a jQuery plugin for easily adding a "more"-link based pagination to an element on ones site.
+loadMore.js is a jQuery plugin for easily adding an AJAX-based "more"-link pagination to an element on ones site.
 
 ## Usage
 
@@ -30,6 +30,10 @@ Advanced:
 * **pageSize** - how many elements should be expected on a new page? If less than this amount is received we've reached the end and removes the more-link.
 * **pageParam** - what's the name of the query parameter for the page to fetch in the AJAX-requests?
 * **loaded** - a function to execute once a new page has been loaded
+
+## In action on
+
+* Flattr.com, eg. https://flattr.com/profile/pthulin
 
 ## Support
 
