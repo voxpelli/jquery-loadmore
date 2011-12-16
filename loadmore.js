@@ -58,6 +58,10 @@
     };
 
     this.each(function () {
+      if (options.pageSize !== false && $(this).children().length < options.pageSize) {
+        return;
+      }
+
       var $more = $('<a />', {
           'class' : 'more ' + options.className,
           'href' : '#'
