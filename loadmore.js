@@ -3,7 +3,7 @@
 (function ($) {
   "use strict";
 
-  var maybeCall, reachedEnd, update, supportsHistory, replaceHistoryState, idCount = 0;
+  var maybeCall, update, supportsHistory, replaceHistoryState, idCount = 0;
 
   // Below taken from tipsy.js
   maybeCall = function (value, context) {
