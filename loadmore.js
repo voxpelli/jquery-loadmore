@@ -10,15 +10,6 @@
     return (typeof value === 'function') ? (value.call(context)) : value;
   };
 
-  reachedEnd = function () {
-    var $this = $(this),
-      options = $this.data('loadmore-options');
-    if (options.reachedEnd) {
-      options.reachedEnd.call($this);
-    }
-    $this.remove();
-  };
-
   update = function (pageTarget) {
     var $this = $(this),
       options = $this.data('loadmore-options'),
@@ -26,7 +17,7 @@
       currentPage = $this.data('loadmore-page'),
       params = {};
 
-    if ($this.hasClass('loading') || pageTarget < currentPage) {
+    if ($this.hasClass('loading') || pageTarget <= currentPage) {
       return false;
     }
 
@@ -64,11 +55,11 @@
         $newData = $(data).filter('*').insertBefore($this);
 
         if (options.rowsPerPage !== false && $newData.length < options.rowsPerPage) {
-          reachedEnd.call($this[0]);
+          $this.trigger('loadmore:last').remove();
         }
 
-        if (options.loaded && options.loaded.call($newData) === false && $this.closest('.more').length) {
-          reachedEnd.call($this[0]);
+        if (options.complete && options.complete.call($newData) === false && $this.closest('.more').length) {
+          $this.trigger('loadmore:last').remove();
         }
       });
     return false;
@@ -134,8 +125,7 @@
     maxPageCount : false,
     pageParam : 'page',
     pageStartParam : 'start',
-    loaded : false,
-    reachedEnd : false,
+    complete : false,
     useHistoryAPI : true
   };
 
@@ -154,4 +144,18 @@
       );
     }
   };
+
+  if (supportsHistory) {
+    $(window).on('popstate', function (event) {
+      var id, $elem, state = event.originalEvent.state.loadmore || {};
+      for (id in state) {
+        if (state.hasOwnProperty(id)) {
+          $elem = $('#' + id);
+          if ($elem.length) {
+            update.call($elem[0], state[id]);
+          }
+        }
+      }
+    });
+  }
 }(jQuery));
