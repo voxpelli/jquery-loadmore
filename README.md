@@ -23,17 +23,25 @@ Advanced:
 
 ## Advanced options
 
+* **id** - a string identifier for this particular pager to make it easier for the History API integration to restore the correct pager.
 * **className** - extra classes to add to the more-link container
 * **text** - text to use in the more-link - should be either a string or a function
 * **loadingText** - text to use in the more-link when it is loading - should be either a string or a function
 * **page** - which page should be fetched on the first more-click?
-* **pageSize** - how many elements should be expected on a new page? If less than this amount is received we've reached the end and removes the more-link.
-* **pageParam** - what's the name of the query parameter for the page to fetch in the AJAX-requests?
-* **loaded** - a function to execute once a new page has been loaded
+* **rowsPerPage** - how many elements should be expected on a new page? If less than this amount is received we've reached the end and removes the more-link.
+* **maxPageCount** - the maximum numbers of pages to fetch at once - used by the History API integration
+* **pageParam** - the query parameter used to specify which page to fetch
+* **pageStartParam** - when more than one page is fetched at once this is the query parameter used to specify the page to start from
+* **complete** - a function to execute once a new page has been loaded, return false if the pager should be removed
+* **useHistoryAPI** - whether to use the History API in supported browsers or not
+
+### Events
+
+* **loadmore:last** - triggered on the pager when the last page has been fetched
 
 ## In action on
 
-* Flattr.com, eg. https://flattr.com/profile/pthulin
+* **Flattr.com**, eg. https://flattr.com/profile/voxpelli
 
 ## Support
 
