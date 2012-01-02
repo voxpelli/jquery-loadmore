@@ -3,7 +3,7 @@
 (function ($) {
   "use strict";
 
-  var maybeCall, update, supportsHistory, replaceHistoryState, idCount = 0;
+  var maybeCall, update, moreClick, supportsHistory, replaceHistoryState, idCount = 0;
 
   // Below taken from tipsy.js
   maybeCall = function (value, context) {
@@ -58,11 +58,15 @@
           $this.trigger('loadmore:last').remove();
         }
 
-        if (options.complete && options.complete.call($newData) === false && $this.closest('.more').length) {
+        if (options.complete && options.complete.call($newData) === false && $this.parent().length) {
           $this.trigger('loadmore:last').remove();
         }
       });
     return false;
+  };
+
+  moreClick = function () {
+    return update.call(this, $(this).data('loadmore-page') + 1);
   };
 
   $.fn.loadmore = function (url, options) {
@@ -93,7 +97,7 @@
 
       $more = $('<a />', {
         'id' : id,
-        'class' : 'more ' + options.className,
+        'class' : options.className,
         'href' : '#'
       })
         .data('loadmore-page', options.page)
@@ -103,9 +107,7 @@
       $text.appendTo($more)
         .text(maybeCall(options.text, $text[0]));
 
-      $more.appendTo(this).click(function () {
-        return update.call(this, $(this).data('loadmore-page') + 1);
-      });
+      $more.appendTo(this).click(moreClick);
 
       if (window.history.state && window.history.state.loadmore && window.history.state.loadmore[id]) {
         update.call($more[0], window.history.state.loadmore[id]);
@@ -117,7 +119,7 @@
 
   $.fn.loadmore.defaults = {
     id : null,
-    className : '',
+    className : 'more',
     text : 'More',
     loadingText : 'Loading',
     page : 0,
@@ -146,8 +148,15 @@
   };
 
   if (supportsHistory) {
+    // Below taken from jquery.pjax.js
+    // Add the state property to jQuery's event object so we can use it in
+    // $(window).bind('popstate')
+    if ( $.inArray('state', $.event.props) < 0 ) {
+      $.event.props.push('state');
+    }
+
     $(window).on('popstate', function (event) {
-      var id, $elem, state = event.originalEvent.state.loadmore || {};
+      var id, $elem, state = event.state.loadmore || {};
       for (id in state) {
         if (state.hasOwnProperty(id)) {
           $elem = $('#' + id);
