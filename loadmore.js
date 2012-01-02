@@ -151,7 +151,7 @@
     // Below taken from jquery.pjax.js
     // Add the state property to jQuery's event object so we can use it in
     // $(window).bind('popstate')
-    if ( $.inArray('state', $.event.props) < 0 ) {
+    if ($.inArray('state', $.event.props) < 0) {
       $.event.props.push('state');
     }
 
