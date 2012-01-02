@@ -3,86 +3,148 @@
 (function ($) {
   "use strict";
 
+  var maybeCall, supportsHistory, replaceHistoryState, idCount = 0;
+
   // Below taken from tipsy.js
-  var maybeCall = function (value, context) {
+  maybeCall = function (value, context) {
     return (typeof value === 'function') ? (value.call(context)) : value;
   };
 
-  $.fn.loadMore = function (url, options) {
-    var done, update;
+  $.fn.loadmore = function (url, options) {
+    var reachedEnd, update;
 
-    options = $.extend({}, $.fn.loadMore.defaults, options);
+    options = $.extend({}, $.fn.loadmore.defaults, options);
 
-    done = function () {
+    reachedEnd = function () {
       var $this = $(this);
-      if (options.done) {
-        options.done.call($this);
+      if (options.reachedEnd) {
+        options.reachedEnd.call($this);
       }
       $this.remove();
     };
 
-    update = function () {
-      var $this = $(this), $text = $this.children('span.text'), requestedPage = options.page;
+    update = function (pageTarget) {
+      var $this = $(this),
+        $text = $this.children('span.text'),
+        currentPage = $this.data('loadmore-page'),
+        params = {};
 
-      if ($this.hasClass('loading')) {
+      if ($this.hasClass('loading') || pageTarget < currentPage) {
         return false;
       }
 
       $this.addClass('loading');
       $text.text(maybeCall(options.loadingText, $text[0]));
 
-      $.get(url, {page : (options.page + 1)})
+      if (pageTarget - currentPage > 1) {
+        params[options.pageStartParam] = currentPage + 1;
+        if (options.maxPageCount !== false && options.maxPageCount < pageTarget - currentPage) {
+          pageTarget = currentPage + options.maxPageCount;
+        }
+      }
+      params[options.pageParam] = pageTarget;
+
+      $.get(url, params)
         .fail(function () {
           //TODO: Do the fail dance
         })
         .done(function (data) {
-          if (requestedPage !== options.page) {
+          if (currentPage !== $this.data('loadmore-page')) {
             return;
           }
 
-          options.page += 1;
+          var historyState = {}, $newData;
+
+          $this.data('loadmore-page', pageTarget);
           $this.removeClass('loading');
           $text.text(maybeCall(options.text, $text[0]));
 
-          var $newData = $(data).filter('*').insertBefore($this);
+          if (options.useHistoryAPI) {
+            historyState[$this.attr('id')] = pageTarget;
+            replaceHistoryState({loadmore : historyState});
+          }
 
-          if (options.pageSize !== false && $newData.length < options.pageSize) {
-            done.call($this[0]);
+          $newData = $(data).filter('*').insertBefore($this);
+
+          if (options.rowsPerPage !== false && $newData.length < options.rowsPerPage) {
+            reachedEnd.call($this[0]);
           }
 
           if (options.loaded && options.loaded.call($newData) === false && $this.closest('.more').length) {
-            done.call($this[0]);
+            reachedEnd.call($this[0]);
           }
         });
       return false;
     };
 
     this.each(function () {
-      if (options.pageSize !== false && $(this).children().length < options.pageSize) {
+      if (options.rowsPerPage !== false && $(this).children().length < options.rowsPerPage) {
         return;
       }
 
-      var $more = $('<a />', {
-          'class' : 'more ' + options.className,
-          'href' : '#'
-        }),
-        $text = $('<span />', {'class' : 'text'});
-      $text
-        .appendTo($more)
+      var $more, $text, id, idDuplicates = 0;
+
+      if (options.id) {
+        id = options.id;
+        while ($('#' + id).length) {
+          idDuplicates += 1;
+          id = options.id + '-' + idDuplicates;
+        }
+      } else {
+        idCount += 1;
+        id = 'loadmore-' + idCount;
+      }
+
+      $more = $('<a />', {
+        'id' : id,
+        'class' : 'more ' + options.className,
+        'href' : '#'
+      }).data('loadmore-page', options.page);
+
+      $text = $('<span />', {'class' : 'text'});
+      $text.appendTo($more)
         .text(maybeCall(options.text, $text[0]));
-      $more.appendTo(this).click(update);
+
+      $more.appendTo(this).click(function () {
+        return update.call(this, $(this).data('loadmore-page') + 1);
+      });
+
+      if (window.history.state && window.history.state.loadmore && window.history.state.loadmore[id]) {
+        update.call($more[0], window.history.state.loadmore[id]);
+      }
     });
 
     return this;
   };
 
-  $.fn.loadMore.defaults = {
-    'className' : '',
+  $.fn.loadmore.defaults = {
+    id : null,
+    className : '',
     text : 'More',
     loadingText : 'Loading',
     page : 0,
-    pageSize : false,
-    'pageParam' : 'page',
-    loaded : false
+    rowsPerPage : false,
+    maxPageCount : false,
+    pageParam : 'page',
+    pageStartParam : 'start',
+    loaded : false,
+    reachedEnd : false,
+    useHistoryAPI : true
+  };
+
+  // Below taken from jquery.pjax.js
+  supportsHistory =
+    window.history && window.history.pushState && window.history.replaceState
+    // pushState isn't reliable on iOS yet.
+    && !navigator.userAgent.match(/(iPod|iPhone|iPad|WebApps\/.+CFNetwork)/);
+
+  replaceHistoryState = function (state, title, url) {
+    if (supportsHistory) {
+      window.history.replaceState(
+        jQuery.extend(true, window.history.state, state),
+        title || document.title,
+        url || window.location.href
+      );
+    }
   };
 }(jQuery));

@@ -37,4 +37,4 @@ Advanced:
 
 ## Support
 
-[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=voxpelli&url=https://github.com/voxpelli/jquery-loadmore&title=loadMore.js&language=en_GB&tags=github&category=software)
+[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=voxpelli&url=https://github.com/voxpelli/jquery-loadmore&title=loadmore.js&language=en_GB&tags=github&category=software)
