@@ -27,8 +27,8 @@ Advanced:
 * **className** - extra classes to add to the more-link container
 * **text** - text to use in the more-link - should be either a string or a function
 * **loadingText** - text to use in the more-link when it is loading - should be either a string or a function
-* **page** - which page should be fetched on the first more-click?
-* **rowsPerPage** - how many elements should be expected on a new page? If less than this amount is received we've reached the end and removes the more-link.
+* **page** - the current page in the list
+* **rowsPerPage** - how many elements should be expected on a new page? If less than this amount is received we've reached the end and will remove the pager
 * **maxPageCount** - the maximum numbers of pages to fetch at once - used by the History API integration
 * **pageParam** - the query parameter used to specify which page to fetch
 * **pageStartParam** - when more than one page is fetched at once this is the query parameter used to specify the page to start from
