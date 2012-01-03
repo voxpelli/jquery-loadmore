@@ -131,11 +131,11 @@
     useHistoryAPI : true
   };
 
-  // Below taken from jquery.pjax.js
+  // Below partly taken from jquery.pjax.js
   supportsHistory =
     window.history && window.history.pushState && window.history.replaceState
-    // pushState isn't reliable on iOS yet.
-    && !navigator.userAgent.match(/(iPod|iPhone|iPad|WebApps\/.+CFNetwork)/);
+    // History API isn't reliable on iOS yet and Safari and Chrome doesn't implement history.state
+    && !navigator.userAgent.match(/(iPod|iPhone|iPad|Safari\/|Chrome\/|WebApps\/.+CFNetwork)/);
 
   if (supportsHistory) {
     // Below taken from jquery.pjax.js
@@ -146,7 +146,7 @@
     }
 
     $(window).on('popstate', function (event) {
-      var id, $elem, state = event.state.loadmore || {};
+      var id, $elem, state = (event.state || {}).loadmore || {};
       for (id in state) {
         if (state.hasOwnProperty(id)) {
           $elem = $('#' + id);
