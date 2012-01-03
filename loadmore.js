@@ -3,7 +3,7 @@
 (function ($) {
   "use strict";
 
-  var maybeCall, update, moreClick, supportsHistory, replaceHistoryState, idCount = 0;
+  var maybeCall, update, moreClick, supportsHistory, idCount = 0;
 
   // Below taken from tipsy.js
   maybeCall = function (value, context) {
@@ -47,9 +47,9 @@
         $this.removeClass('loading');
         $text.text(maybeCall(options.text, $text[0]));
 
-        if (options.useHistoryAPI) {
+        if (supportsHistory && options.useHistoryAPI) {
           historyState[$this.attr('id')] = pageTarget;
-          replaceHistoryState({loadmore : historyState});
+          window.history.replaceState(jQuery.extend(true, window.history.state, {loadmore : historyState}), document.title);
         }
 
         $newData = $(data).filter('*').insertBefore($this);
@@ -109,7 +109,7 @@
 
       $more.appendTo(this).click(moreClick);
 
-      if (window.history.state && window.history.state.loadmore && window.history.state.loadmore[id]) {
+      if (supportsHistory && options.useHistoryAPI && window.history.state && window.history.state.loadmore && window.history.state.loadmore[id]) {
         update.call($more[0], window.history.state.loadmore[id]);
       }
     });
@@ -137,16 +137,6 @@
     // pushState isn't reliable on iOS yet.
     && !navigator.userAgent.match(/(iPod|iPhone|iPad|WebApps\/.+CFNetwork)/);
 
-  replaceHistoryState = function (state, title, url) {
-    if (supportsHistory) {
-      window.history.replaceState(
-        jQuery.extend(true, window.history.state, state),
-        title || document.title,
-        url || window.location.href
-      );
-    }
-  };
-
   if (supportsHistory) {
     // Below taken from jquery.pjax.js
     // Add the state property to jQuery's event object so we can use it in
@@ -167,4 +157,15 @@
       }
     });
   }
+
+  $.loadmore = {
+    supportsHistory : supportsHistory,
+    removeHistoryState : function (id) {
+        if (supportsHistory && window.history.state && window.history.state.loadmore && window.history.state.loadmore[id]) {
+          var state =  window.history.state;
+          delete state.loadmore[id];
+          window.history.replaceState(state, document.title);
+        }
+      }
+  };
 }(jQuery));
