@@ -54,7 +54,7 @@
 
         $newData = $(data).filter('*').insertBefore($this);
 
-        if (options.rowsPerPage !== false && $newData.length < options.rowsPerPage) {
+        if (options.rowsPerPage !== false && $newData.length < options.rowsPerPage * (pageTarget - currentPage)) {
           $this.trigger('loadmore:last').remove();
         }
 
