@@ -14,7 +14,7 @@
     var $this = $(this),
       options = $this.data('loadmore-options'),
       $text = $this.children('span.text'),
-      currentPage = $this.data('loadmore-page'),
+      currentPage = (options.useOffset ? $this.siblings().length : $this.data('loadmore-page')),
       params = {};
 
     if ($this.hasClass('loading') || pageTarget <= currentPage) {
@@ -26,7 +26,7 @@
 
     if (pageTarget - currentPage > 1) {
       params[options.pageStartParam] = currentPage + 1;
-      if (options.maxPageCount !== false && options.maxPageCount < pageTarget - currentPage) {
+      if (options.maxPageCount !== false && (options.maxPageCount * (options.useOffset ? options.rowsPerPage : 1)) < pageTarget - currentPage) {
         pageTarget = currentPage + options.maxPageCount;
       }
     }
@@ -37,13 +37,15 @@
         //TODO: Do the fail dance
       })
       .done(function (data) {
-        if (currentPage !== $this.data('loadmore-page')) {
+        if (!options.useOffset && currentPage !== $this.data('loadmore-page')) {
           return;
         }
 
         var historyState = {}, $newData;
 
-        $this.data('loadmore-page', pageTarget);
+        if (!options.useOffset) {
+          $this.data('loadmore-page', pageTarget);
+        }
         $this.removeClass('loading');
         $text.text(maybeCall(options.text, $text[0]));
 
@@ -54,7 +56,7 @@
 
         $newData = $(data).filter('*').insertBefore($this);
 
-        if (options.rowsPerPage !== false && $newData.length < options.rowsPerPage * (pageTarget - currentPage)) {
+        if (options.rowsPerPage !== false && $newData.length < (options.useOffset ? 1 : options.rowsPerPage) * (pageTarget - currentPage)) {
           $this.trigger('loadmore:last').remove();
         }
 
@@ -66,7 +68,15 @@
   };
 
   moreClick = function () {
-    return update.call(this, $(this).data('loadmore-page') + 1);
+    var page, $this = $(this), options = $this.data('loadmore-options');
+    if (options.useOffset && options.rowsPerPage) {
+      page = $this.siblings().length + options.rowsPerPage;
+    }
+    else
+    {
+      page = $this.data('loadmore-page') + 1;
+    }
+    return update.call(this, page);
   };
 
   $.fn.loadmore = function (url, options) {
@@ -100,8 +110,11 @@
         'class' : options.className,
         'href' : '#'
       })
-        .data('loadmore-page', options.page)
         .data('loadmore-options', options);
+
+      if (!options.useOffset) {
+        $more.data('loadmore-page', options.page);
+      }
 
       $text = $('<span />', {'class' : 'text'});
       $text.appendTo($more)
@@ -128,7 +141,8 @@
     pageParam : 'page',
     pageStartParam : 'start',
     complete : false,
-    useHistoryAPI : true
+    useHistoryAPI : true,
+    useOffset : false
   };
 
   // Below partly taken from jquery.pjax.js
