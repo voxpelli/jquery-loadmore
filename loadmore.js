@@ -43,7 +43,7 @@
           return;
         }
 
-        var historyState = {}, $newData;
+        var historyState = {}, $newData, itemCount;
 
         if (!options.useOffset) {
           $this.data('loadmore-page', pageTarget);
@@ -60,13 +60,19 @@
         if (options.filterResult) {
           $newData = $newData.find(options.filterResult).add($newData.filter(options.filterResult));
         }
+
+
+        $newData = $(document.createDocumentFragment()).append($newData);
+
+        itemCount = (options.itemSelector ? $(options.itemSelector) : $newData).length;
+
         if (options.useExistingButton) {
           $newData.appendTo($this.data('loadmore-container'));
         } else {
           $newData.insertBefore($this);
         }
 
-        if (options.rowsPerPage !== false && $(options.itemSelector || '*', $newData).length < (options.useOffset ? 1 : options.rowsPerPage) * (pageTarget - currentPage)) {
+        if (options.rowsPerPage !== false && itemCount < (options.useOffset ? 1 : options.rowsPerPage) * (pageTarget - currentPage)) {
           $this.trigger('loadmore:last').remove();
         }
 
