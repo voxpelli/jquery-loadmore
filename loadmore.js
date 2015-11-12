@@ -27,7 +27,7 @@
     if (pageTarget - currentPage > 1 && options.pageStartParam) {
       params[options.pageStartParam] = currentPage + 1 + options.baseOffset;
       if (options.maxPageCount !== false && (options.maxPageCount * (options.useOffset ? options.rowsPerPage : 1)) < pageTarget - currentPage) {
-        pageTarget = currentPage + options.maxPageCount + options.baseOffset;
+        pageTarget = currentPage + options.maxPageCount;
       }
     }
     if (options.pageParam) {
