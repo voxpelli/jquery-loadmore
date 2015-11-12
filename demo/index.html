@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>jQuery Loadmore</title>
+  <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+  <script src="../loadmore.js"></script>
+</head>
+<body>
+  <h1>jQuery Loadmore</h1>
+
+  <div class="list">
+    <ul>
+      <li>One</li>
+      <li>Two</li>
+    </ul>
+    <ul>
+      <li>Three</li>
+      <li>Four</li>
+    </ul>
+  </div>
+
+  <script type="text/javascript">
+    $('.list').loadmore('', {
+      // 'className' : '',
+      text : 'More',
+      loadingText : 'Loading',
+      filterResult: '.list',
+      // page : 0,
+      // pageSize : false,
+      // 'pageParam' : 'page'
+    });
+  </script>
+</body>
