@@ -54,7 +54,7 @@
           window.history.replaceState(jQuery.extend(true, window.history.state, {loadmore : historyState}), document.title);
         }
 
-        $newData = $(data).filter('*').insertBefore($this);
+        $newData = $(data).filter(options.filterResult).insertBefore($this);
 
         if (options.rowsPerPage !== false && $newData.length < (options.useOffset ? 1 : options.rowsPerPage) * (pageTarget - currentPage)) {
           $this.trigger('loadmore:last').remove();
@@ -140,6 +140,7 @@
     maxPageCount : false,
     pageParam : 'page',
     pageStartParam : 'start',
+    filterResult: '*',
     complete : false,
     useHistoryAPI : true,
     useOffset : false
