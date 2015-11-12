@@ -3,7 +3,7 @@
 (function ($) {
   "use strict";
 
-  var maybeCall, update, moreClick, supportsHistory, idCount = 0;
+  var maybeCall, update, getItemCount, moreClick, supportsHistory, idCount = 0;
 
   // Below taken from tipsy.js
   maybeCall = function (value, context) {
@@ -14,7 +14,7 @@
     var $this = $(this),
       options = $this.data('loadmore-options'),
       $text = $this.children('span.text'),
-      currentPage = (options.useOffset ? $this.siblings().length : $this.data('loadmore-page')),
+      currentPage = (options.useOffset ? getItemCount($this, options) : $this.data('loadmore-page')),
       params = {};
 
     if ($this.hasClass('loading') || pageTarget <= currentPage) {
@@ -24,13 +24,15 @@
     $this.addClass('loading');
     $text.text(maybeCall(options.loadingText, $text[0]));
 
-    if (pageTarget - currentPage > 1) {
-      params[options.pageStartParam] = currentPage + 1;
+    if (pageTarget - currentPage > 1 && options.pageStartParam) {
+      params[options.pageStartParam] = currentPage + 1 + options.baseOffset;
       if (options.maxPageCount !== false && (options.maxPageCount * (options.useOffset ? options.rowsPerPage : 1)) < pageTarget - currentPage) {
-        pageTarget = currentPage + options.maxPageCount;
+        pageTarget = currentPage + options.maxPageCount + options.baseOffset;
       }
     }
-    params[options.pageParam] = pageTarget;
+    if (options.pageParam) {
+      params[options.pageParam] = pageTarget + options.baseOffset;
+    }
 
     $.get(options.url, params)
       .fail(function () {
@@ -56,7 +58,7 @@
 
         $newData = $(data).filter(options.filterResult).insertBefore($this);
 
-        if (options.rowsPerPage !== false && $newData.length < (options.useOffset ? 1 : options.rowsPerPage) * (pageTarget - currentPage)) {
+        if (options.rowsPerPage !== false && $(options.itemSelector || '*', $newData).length < (options.useOffset ? 1 : options.rowsPerPage) * (pageTarget - currentPage)) {
           $this.trigger('loadmore:last').remove();
         }
 
@@ -67,10 +69,14 @@
     return false;
   };
 
-  moreClick = function () {
+  getItemCount = function ($this, options) {
+    return (options.itemSelector ? $(options.itemSelector) : $this.siblings()).length;
+  };
+
+  moreClick = function (e) {
     var page, $this = $(this), options = $this.data('loadmore-options');
-    if (options.useOffset && options.rowsPerPage) {
-      page = $this.siblings().length + options.rowsPerPage;
+    if (options.useOffset) {
+      page = getItemCount($this, options) + options.rowsPerPage;
     }
     else
     {
@@ -88,11 +94,9 @@
     }
 
     this.each(function () {
-      if (options.rowsPerPage !== false && $(this).children().length < options.rowsPerPage) {
-        return;
-      }
+      var $more, $text, id, itemCount, idDuplicates = 0;
 
-      var $more, $text, id, idDuplicates = 0;
+      itemCount = (options.itemSelector ? $(options.itemSelector) : $(this).children()).length;
 
       if (options.id) {
         id = options.id;
@@ -105,22 +109,48 @@
         id = 'loadmore-' + idCount;
       }
 
-      $more = $('<a />', {
-        'id' : id,
-        'class' : options.className,
-        'href' : '#'
-      })
-        .data('loadmore-options', options);
+      if (options.useExistingButton) {
+        $more = $(options.useExistingButton);
+
+        options.text = $more.text();
+
+        $more.get(0).search.substr(1).split('&').some(function (pair) {
+          pair = pair.split('=');
+          if (pair[0] === options.pageParam) {
+            options.baseOffset = parseInt(pair[1]) + options.baseOffset;
+            return true;
+          } else if (pair[0] === options.pageStartParam) {
+            options.baseOffset = parseInt(pair[1]) + options.baseOffset - itemCount;
+            return true;
+          }
+        });
+      } else {
+        $more = $('<a />', {
+          'id' : id,
+          'class' : options.className,
+          'href' : '#'
+        });
+
+        $text = $('<span />', {'class' : 'text'});
+        $text.appendTo($more)
+          .text(maybeCall(options.text, $text[0]));
+      }
+
+      $more.data('loadmore-options', options);
 
       if (!options.useOffset) {
         $more.data('loadmore-page', options.page);
       }
 
-      $text = $('<span />', {'class' : 'text'});
-      $text.appendTo($more)
-        .text(maybeCall(options.text, $text[0]));
+      if (!options.useExistingButton) {
+        if (options.rowsPerPage !== false && itemCount < options.rowsPerPage) {
+          return;
+        }
 
-      $more.appendTo(this).click(moreClick);
+        $more.appendTo(this);
+      }
+
+      $more.click(moreClick);
 
       if (supportsHistory && options.useHistoryAPI && window.history.state && window.history.state.loadmore && window.history.state.loadmore[id]) {
         update.call($more[0], window.history.state.loadmore[id]);
@@ -133,6 +163,7 @@
   $.fn.loadmore.defaults = {
     id : null,
     className : 'more',
+    useExistingButton: false,
     text : 'More',
     loadingText : 'Loading',
     page : 0,
@@ -143,7 +174,8 @@
     filterResult: '*',
     complete : false,
     useHistoryAPI : true,
-    useOffset : false
+    useOffset : false,
+    baseOffset: 0
   };
 
   // Below partly taken from jquery.pjax.js

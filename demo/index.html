@@ -11,24 +11,29 @@
 
   <div class="list">
     <ul>
-      <li>One</li>
-      <li>Two</li>
+      <li class="item">One</li>
+      <li class="item">Two</li>
+      <li class="item">Three</li>
     </ul>
     <ul>
-      <li>Three</li>
-      <li>Four</li>
+      <li class="item">Four</li>
+      <li class="item">Five</li>
     </ul>
   </div>
 
+  <a class="button" href="?foo=12">Next</a>
+
   <script type="text/javascript">
     $('.list').loadmore('', {
-      // 'className' : '',
-      text : 'More',
       loadingText : 'Loading',
       filterResult: '.list',
-      // page : 0,
-      // pageSize : false,
-      // 'pageParam' : 'page'
+      useExistingButton: '.button',
+      useOffset: true,
+      rowsPerPage: 5,
+      baseOffset: -1,
+      itemSelector: '.item',
+      pageParam : false,
+      pageStartParam: 'foo'
     });
   </script>
 </body>

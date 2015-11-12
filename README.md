@@ -29,10 +29,15 @@ Advanced:
 * **page** - the current page in the list
 * **rowsPerPage** - how many elements should be expected on a new page? If less than this amount is received we've reached the end and will remove the pager
 * **maxPageCount** - the maximum numbers of pages to fetch at once - used by the History API integration
-* **pageParam** - the query parameter used to specify which page to fetch
-* **pageStartParam** - when more than one page is fetched at once this is the query parameter used to specify the page to start from
+* **pageParam** - the query parameter used to specify which page to fetch. If set to `false` no param will be specified.
+* **pageStartParam** - when more than one page is fetched at once this is the query parameter used to specify the page to start from. If set to `false` no param will be specified.
 * **complete** - a function to execute once a new page has been loaded, return false if the pager should be removed
 * **useHistoryAPI** - whether to use the History API in supported browsers or not
+* **useOffset** – whether to use offsets rather than page numbers
+* **useExistingButton** – rather than creating a new button, use an existing one matching this selector / element
+* **filterResult** – filter the received result by these selectors
+* **itemSelector** – the selector used to count items
+* **baseOffset** – an offset to add to all offsets. Will be parsed from any `pageParam` or `pageStartParam` query params on an existing button.
 
 ### Events
 
