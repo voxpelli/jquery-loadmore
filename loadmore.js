@@ -61,10 +61,9 @@
           $newData = $newData.find(options.filterResult).add($newData.filter(options.filterResult));
         }
 
-
         $newData = $(document.createDocumentFragment()).append($newData);
 
-        itemCount = (options.itemSelector ? $(options.itemSelector) : $newData).length;
+        itemCount = (options.itemSelector ? $(options.itemSelector, $newData) : $newData).length;
 
         if (options.useExistingButton) {
           $newData.appendTo($this.data('loadmore-container'));
