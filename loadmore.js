@@ -61,14 +61,14 @@
           $newData = $newData.find(options.filterResult).add($newData.filter(options.filterResult));
         }
 
-        $newData = $(document.createDocumentFragment()).append($newData);
+        $newData = $('<div>').append($newData);
 
         itemCount = (options.itemSelector ? $(options.itemSelector, $newData) : $newData).length;
 
         if (options.useExistingButton) {
-          $newData.appendTo($this.data('loadmore-container'));
+          $newData.children().appendTo($this.data('loadmore-container'));
         } else {
-          $newData.insertBefore($this);
+          $newData.children().insertBefore($this);
         }
 
         if (options.rowsPerPage !== false && itemCount < (options.useOffset ? 1 : options.rowsPerPage) * (pageTarget - currentPage)) {
