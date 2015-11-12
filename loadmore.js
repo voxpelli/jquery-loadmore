@@ -60,7 +60,11 @@
         if (options.filterResult) {
           $newData = $newData.find(options.filterResult).add($newData.filter(options.filterResult));
         }
-        $newData.insertBefore($this);
+        if (options.useExistingButton) {
+          $newData.appendTo($this.data('loadmore-container'));
+        } else {
+          $newData.insertBefore($this);
+        }
 
         if (options.rowsPerPage !== false && $(options.itemSelector || '*', $newData).length < (options.useOffset ? 1 : options.rowsPerPage) * (pageTarget - currentPage)) {
           $this.trigger('loadmore:last').remove();
@@ -74,7 +78,7 @@
   };
 
   getItemCount = function ($this, options) {
-    return (options.itemSelector ? $(options.itemSelector) : $this.siblings()).length;
+    return (options.itemSelector ? $(options.itemSelector, $this.data('loadmore-container')) : $this.siblings()).length;
   };
 
   moreClick = function (e) {
@@ -100,7 +104,7 @@
     this.each(function () {
       var $more, $text, id, itemCount, idDuplicates = 0;
 
-      itemCount = (options.itemSelector ? $(options.itemSelector) : $(this).children()).length;
+      itemCount = (options.itemSelector ? $(options.itemSelector, this) : $(this).children()).length;
 
       if (options.id) {
         id = options.id;
@@ -141,6 +145,7 @@
       }
 
       $more.data('loadmore-options', options);
+      $more.data('loadmore-container', this);
 
       if (!options.useOffset) {
         $more.data('loadmore-page', options.page);

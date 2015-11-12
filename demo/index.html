@@ -9,24 +9,26 @@
 <body>
   <h1>jQuery Loadmore</h1>
 
-  <div class="list">
-    <ul>
-      <li class="item">One</li>
-      <li class="item">Two</li>
-      <li class="item">Three</li>
-    </ul>
-    <ul>
-      <li class="item">Four</li>
-      <li class="item">Five</li>
-    </ul>
+  <div class="test">
+    <div class="list">
+      <ul>
+        <li class="item">One</li>
+        <li class="item">Two</li>
+        <li class="item">Three</li>
+      </ul>
+      <ul>
+        <li class="item">Four</li>
+        <li class="item">Five</li>
+      </ul>
+    </div>
   </div>
 
-  <a class="button" href="?foo=12">Next</a>
+  <a class="button" href="">Next</a>
 
   <script type="text/javascript">
     $('.list').loadmore('', {
       loadingText : 'Loading',
-      filterResult: '.list',
+      filterResult: '.list > *',
       useExistingButton: '.button',
       useOffset: true,
       rowsPerPage: 5,
