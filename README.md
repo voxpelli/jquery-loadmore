@@ -17,8 +17,7 @@ Advanced:
       loadingText : 'Loading',
       page : 0,
       pageSize : false,
-      'pageParam' : 'page',
-      loaded : false
+      'pageParam' : 'page'
     });
 
 ## Advanced options
