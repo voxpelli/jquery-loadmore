@@ -114,7 +114,7 @@
     }
 
     this.each(function () {
-      var $more, $text, id, itemCount, idDuplicates = 0;
+      var $more, $text, id, itemCount, moreBaseOffset, idDuplicates = 0;
 
       itemCount = (options.itemSelector ? $(options.itemSelector, this) : $(this).children()).length;
 
@@ -134,16 +134,11 @@
 
         options.text = $more.text();
 
-        $more.get(0).search.substr(1).split('&').some(function (pair) {
-          pair = pair.split('=');
-          if (pair[0] === options.pageParam) {
-            options.baseOffset = parseInt(pair[1]) + options.baseOffset;
-            return true;
-          } else if (pair[0] === options.pageStartParam) {
-            options.baseOffset = parseInt(pair[1]) + options.baseOffset - itemCount;
-            return true;
-          }
-        });
+        moreBaseOffset = options.interpretUrl ? options.interpretUrl($more.get(0), itemCount, options): undefined;
+
+        if (moreBaseOffset) {
+          options.baseOffset = moreBaseOffset;
+        }
       } else {
         $more = $('<a />', {
           'id' : id,
@@ -197,7 +192,23 @@
     useHistoryAPI : true,
     useOffset : false,
     baseOffset: 0,
-    processUrl: false
+    processUrl: false,
+    interpretUrl: function (loc, itemCount, options) {
+      var result;
+
+      loc.search.substr(1).split('&').some(function (pair) {
+        pair = pair.split('=');
+        if (pair[0] === options.pageParam) {
+          result = parseInt(pair[1]) + options.baseOffset;
+          return true;
+        } else if (pair[0] === options.pageStartParam) {
+          result = parseInt(pair[1]) + options.baseOffset - itemCount;
+          return true;
+        }
+      });
+
+      return result;
+    }
   };
 
   // Below partly taken from jquery.pjax.js

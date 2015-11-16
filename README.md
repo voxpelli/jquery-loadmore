@@ -39,6 +39,7 @@ Advanced:
 * **itemSelector** – the selector used to count items
 * **baseOffset** – an offset to add to all offsets. Will be parsed from any `pageParam` or `pageStartParam` query params on an existing button.
 * **processUrl** – for complex URL cases, define a method that will be sent `url` and `params` and returns either an object with a `url` and `params` key or a `url` string if no params should be used anymore.
+* **interpretUrl** – if one uses both `processUrl` and `useExistingButton` then one will likely have to have a custom method to extract the modfied `baseOffset` from the existing button. Receives `Location` object, `itemCount` and `options`.
 
 ### Events
 
