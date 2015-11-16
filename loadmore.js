@@ -15,6 +15,7 @@
       options = $this.data('loadmore-options'),
       $text = $this.children('span.text'),
       currentPage = (options.useOffset ? getItemCount($this, options) : $this.data('loadmore-page')),
+      url = options.url,
       params = {};
 
     if ($this.hasClass('loading') || pageTarget <= currentPage) {
@@ -34,7 +35,13 @@
       params[options.pageParam] = pageTarget + options.baseOffset;
     }
 
-    $.get(options.url, params)
+    if (options.processUrl) {
+      url = options.processUrl(url, params);
+      params = url.params || {};
+      url = url.url || url;
+    }
+
+    $.get(url, params)
       .fail(function () {
         //TODO: Do the fail dance
       })
@@ -189,7 +196,8 @@
     complete : false,
     useHistoryAPI : true,
     useOffset : false,
-    baseOffset: 0
+    baseOffset: 0,
+    processUrl: false
   };
 
   // Below partly taken from jquery.pjax.js
